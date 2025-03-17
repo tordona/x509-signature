@@ -31,7 +31,6 @@
 
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 #![deny(
-    const_err,
     deprecated,
     improper_ctypes,
     non_shorthand_field_patterns,
@@ -54,7 +53,7 @@
 #![forbid(
     unconditional_recursion,
     unsafe_code,
-    intra_doc_link_resolution_failure,
+    broken_intra_doc_links,
     while_true,
     elided_lifetimes_in_paths
 )]
@@ -301,8 +300,11 @@ pub fn parse_certificate<'a>(certificate: &'a [u8]) -> Result<X509Certificate<'a
     let das = DataAlgorithmSignature::try_from(certificate)?;
     untrusted::Input::from(&*das.inner()).read_all(Error::BadDER, |input| {
         // We require extensions, which means we require version 3
-        if input.read_bytes(5).map_err(|_| Error::BadDER)?
-            != untrusted::Input::from(&[160, 3, 2, 1, 2])
+        if input
+            .read_bytes(5)
+            .map_err(|_| Error::BadDER)?
+            .as_slice_less_safe()
+            != &[160, 3, 2, 1, 2]
         {
             return Err(Error::UnsupportedCertVersion);
         }

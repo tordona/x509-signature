@@ -81,12 +81,12 @@ impl<'a> SubjectPublicKeyInfo<'a> {
         let algorithm: &'static dyn s::VerificationAlgorithm = match algorithm {
             #[cfg(feature = "rsa")]
             SignatureScheme::RSA_PKCS1_SHA256 if restrictions != TLSv13 => match self.algorithm {
-                include_bytes!("data/alg-rsa-encryption.der") => (&s::RSA_PKCS1_2048_8192_SHA256),
+                include_bytes!("data/alg-rsa-encryption.der") => &s::RSA_PKCS1_2048_8192_SHA256,
                 _ => return Err(Error::UnsupportedSignatureAlgorithmForPublicKey),
             },
             #[cfg(feature = "rsa")]
             SignatureScheme::RSA_PKCS1_SHA384 if restrictions != TLSv13 => match self.algorithm {
-                include_bytes!("data/alg-rsa-encryption.der") => (&s::RSA_PKCS1_2048_8192_SHA384),
+                include_bytes!("data/alg-rsa-encryption.der") => &s::RSA_PKCS1_2048_8192_SHA384,
                 _ => return Err(Error::UnsupportedSignatureAlgorithmForPublicKey),
             },
             #[cfg(feature = "rsa")]
